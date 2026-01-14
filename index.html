@@ -12,7 +12,6 @@
             font-size: 12px;
         }
 
-        /* El contenedor principal ahora siempre es visible */
         #mainContent {
             display: block; 
             max-width: 1200px;
@@ -22,7 +21,6 @@
             margin: 0 auto;
         }
 
-        /* Estilos para el Input dentro de la tabla */
         .dni-input {
             width: 95%;
             padding: 5px;
@@ -30,7 +28,7 @@
             border-radius: 4px;
             font-weight: bold;
             font-size: 13px;
-            background-color: #fffde7; /* Un color suave para indicar que es editable */
+            background-color: #fffde7;
         }
         
         .dni-input:focus {
@@ -38,14 +36,12 @@
             background-color: #fff;
         }
 
-        /* Mensaje de error discreto */
         #statusMessage {
             font-weight: bold;
             margin-left: 10px;
             font-style: italic;
         }
 
-        /* Layout Sections */
         .top-section, .bottom-section {
             display: flex;
             gap: 20px;
@@ -61,7 +57,6 @@
             font-size: 14px;
         }
 
-        /* Table Styling */
         table {
             border-collapse: collapse;
             width: 100%;
@@ -72,10 +67,9 @@
             border: 1px solid #888;
             padding: 4px 8px;
             text-align: left;
-            height: 25px; /* Altura mínima para consistencia */
+            height: 25px;
         }
 
-        /* Estilos específicos para tablas superiores */
         .info-table th {
             background-color: #d9e2f3; 
             font-weight: bold;
@@ -88,7 +82,6 @@
              font-style: italic;
         }
         
-        /* Estilos para tablas inferiores (Deuda) */
         .debt-table th {
             background-color: #b4c6e7; 
             text-align: center;
@@ -193,32 +186,41 @@
 
 
 <script>
-    // ==========================================
-    // SIMULACIÓN DE BASE DE DATOS
-    // ==========================================
     const clientesDB = {
-        // Cliente 1
+        // ========================================================================
+        // CASO 1: TARJETA SOLA (Sin PPD/PPI). 
+        // REGLA: 0 Mora = 0 Interés Mora. 
+        // REGLA: Saldo_Total_Mora (0) < Factu_Min (250)
+        // ========================================================================
         "44631847": {
             personal: {
                  nombre: "Anderh Yuver Garcia Bravo", fechanac: "19871115", numtel: "914493014",
-                direccion: "CAL. LOS JAZMINES 105 PROLONGA CION 28 DE JULIO", distrito: "Reque", correo: "ANDERH_20@HOTMAIL.COM",
-                mora: "113 dias", producto: "MILES"
+                direccion: "CAL. LOS JAZMINES 105", distrito: "Reque", correo: "ANDERH_20@HOTMAIL.COM",
+                mora: "0 dias", producto: "MILES" // 0 DIAS MORA
             },
             campana: {
-                tipo: "Refinancia", accionCob: "Refinancia 0", accionTar: "Cancelación TC",
+                tipo: "Preventiva", accionCob: "Recordatorio", accionTar: "Activa",
                 tasaTC: "0", tasaCampTC: "0", tasaPPD: "0", tasaCampPPD: "0", 
-                plazoMax: "60", gift: "Sin Campaña%", plazoMin: "0"
+                plazoMax: "0", gift: "Puntos Dobles", plazoMin: "0"
             },
             deuda: {
                 rows: ["FechaFacturacion", "FechaVencimiento", "Factu_Min", "Factu_Mes", "Mora_Producto", "Saldo_Total", "Capital_Total", "Interes_Total", "Comision_Total", "Saldo_Total_Mora", "Capital_Mora", "Interes_Mora", "Comision_Mora", "Interes_Acumulado"],
-                tarjetaSoles: ["20251125", "20251214", "S/ 2,094.64", "S/ 3,378.21", "113", "S/ 3,378.21", "S/ 2,867.34", "S/ 490.97", "S/ 19.90", "S/ 1,646.34", "S/ 1,210.43", "S/ 416.01", "S/ 19.90", "S/ 33.69"],
-                tarjetaDolares: ["20251125", "20251214", "$ 19.50", "$ 19.50", "51", "$ 19.50", "$ 0.00", "$ 0.00", "$ 19.50", "$ 13.00", "$ 0.00", "$ 0.00", "$ 13.00", "$ 0.00"],
+                // TARJETA: TIENE DEUDA PERO ESTÁ AL DÍA (0 MORA)
+                tarjetaSoles: ["20251125", "20251214", "S/ 250.00", "S/ 1,500.00", "0", "S/ 1,500.00", "S/ 1,500.00", "S/ 0.00", "S/ 0.00", "S/ 0.00", "S/ 0.00", "S/ 0.00", "S/ 0.00", "S/ 0.00"],
+                tarjetaDolares: ["20251125", "20251214", "$ 10.00", "$ 150.00", "0", "$ 150.00", "$ 150.00", "$ 0.00", "$ 0.00", "$ 0.00", "$ 0.00", "$ 0.00", "$ 0.00", "$ 0.00"],
+                // PPD/PPI VACIOS
                 ppd: Array(14).fill("S/ 0.00").map((v, i) => i < 2 ? "0" : i === 4 ? "0" : v),
                 ppdCapital: Array(14).fill("S/ 0.00").map((v, i) => i < 2 ? "0" : i === 4 ? "0" : v),
                 ppi: Array(14).fill("S/ 0.00").map((v, i) => i < 2 ? "0" : i === 4 ? "0" : v)
             }
         },
-        // Cliente 2 (PPD)
+
+        // ========================================================================
+        // CASO 2: TARJETA + PPD (Sin PPI).
+        // REGLA: Tiene Mora (>0) = Tiene Interés Mora.
+        // REGLA: Saldo_Total_Mora (800) < Factu_Min (1000) en Tarjeta.
+        // REGLA: Saldo_Total_Mora (200) < Factu_Min (250) en PPD.
+        // ========================================================================
         "12345678": {
             personal: {
                  nombre: "Juan Perez Sanchez", fechanac: "19900520", numtel: "999888777",
@@ -232,14 +234,23 @@
             },
             deuda: {
                  rows: ["FechaFacturacion", "FechaVencimiento", "Factu_Min", "Factu_Mes", "Mora_Producto", "Saldo_Total", "Capital_Total", "Interes_Total", "Comision_Total", "Saldo_Total_Mora", "Capital_Mora", "Interes_Mora", "Comision_Mora", "Interes_Acumulado"],
-                tarjetaSoles: Array(14).fill("S/ 0.00").map((v, i) => i < 2 ? "0" : i === 4 ? "0" : v),
+                // TARJETA: CON DEUDA Y CON MORA
+                tarjetaSoles: ["20251125", "20251214", "S/ 1,000.00", "S/ 5,000.00", "45", "S/ 5,000.00", "S/ 4,000.00", "S/ 500.00", "S/ 500.00", "S/ 800.00", "S/ 600.00", "S/ 150.00", "S/ 50.00", "S/ 100.00"],
                 tarjetaDolares: Array(14).fill("$ 0.00").map((v, i) => i < 2 ? "0" : i === 4 ? "0" : v),
-                ppd: ["20251125", "20251214", "S/ 500.00", "S/ 15,000.00", "45", "S/ 15,000.00", "S/ 12,000.00", "S/ 2,500.00", "S/ 500.00", "S/ 2,000.00", "S/ 1,500.00", "S/ 400.00", "S/ 100.00", "S/ 150.00"],
-                ppdCapital: ["20251125", "20251214", "S/ 500.00", "S/ 12,000.00", "45", "S/ 12,000.00", "S/ 12,000.00", "S/ 0.00", "S/ 0.00", "S/ 1,500.00", "S/ 1,500.00", "S/ 0.00", "S/ 0.00", "S/ 0.00"],
+                // PPD: CON DEUDA. Saldo Mora (200) < Factu Min (250)
+                ppd: ["20251125", "20251214", "S/ 250.00", "S/ 2,000.00", "45", "S/ 2,000.00", "S/ 1,500.00", "S/ 500.00", "S/ 0.00", "S/ 200.00", "S/ 150.00", "S/ 50.00", "S/ 0.00", "S/ 20.00"],
+                ppdCapital: ["20251125", "20251214", "S/ 250.00", "S/ 2,000.00", "45", "S/ 2,000.00", "S/ 2,000.00", "S/ 0.00", "S/ 0.00", "S/ 200.00", "S/ 200.00", "S/ 0.00", "S/ 0.00", "S/ 0.00"],
+                // PPI VACIO
                 ppi: Array(14).fill("S/ 0.00").map((v, i) => i < 2 ? "0" : i === 4 ? "0" : v)
             }
         },
-         // Cliente 3 (PPI)
+
+        // ========================================================================
+        // CASO 3: TARJETA + PPI (Sin PPD).
+        // REGLA: Tiene Mora (>0) = Tiene Interés Mora.
+        // REGLA: Saldo_Total_Mora (3000) < Factu_Min (3500) en Tarjeta.
+        // REGLA: Saldo_Total_Mora (1200) < Factu_Min (1500) en PPI.
+        // ========================================================================
         "87654321": {
             personal: {
                  nombre: "Maria Lopez Ramos", fechanac: "19850110", numtel: "987654321",
@@ -253,18 +264,17 @@
             },
             deuda: {
                  rows: ["FechaFacturacion", "FechaVencimiento", "Factu_Min", "Factu_Mes", "Mora_Producto", "Saldo_Total", "Capital_Total", "Interes_Total", "Comision_Total", "Saldo_Total_Mora", "Capital_Mora", "Interes_Mora", "Comision_Mora", "Interes_Acumulado"],
-                tarjetaSoles: Array(14).fill("S/ 0.00").map((v, i) => i < 2 ? "0" : i === 4 ? "0" : v),
+                // TARJETA: CON DEUDA Y CON MORA
+                tarjetaSoles: ["20251125", "20251214", "S/ 3,500.00", "S/ 12,000.00", "90", "S/ 12,000.00", "S/ 10,000.00", "S/ 1,500.00", "S/ 500.00", "S/ 3,000.00", "S/ 2,500.00", "S/ 400.00", "S/ 100.00", "S/ 350.00"],
                 tarjetaDolares: Array(14).fill("$ 0.00").map((v, i) => i < 2 ? "0" : i === 4 ? "0" : v),
+                // PPD VACIO
                 ppd: Array(14).fill("S/ 0.00").map((v, i) => i < 2 ? "0" : i === 4 ? "0" : v),
                 ppdCapital: Array(14).fill("S/ 0.00").map((v, i) => i < 2 ? "0" : i === 4 ? "0" : v),
-                ppi: ["20251125", "20251214", "S/ 1,200.00", "S/ 85,000.00", "90", "S/ 85,000.00", "S/ 70,000.00", "S/ 14,000.00", "S/ 1,000.00", "S/ 5,000.00", "S/ 3,500.00", "S/ 1,200.00", "S/ 300.00", "S/ 450.00"],
+                // PPI: CON DEUDA. Saldo Mora (1200) < Factu Min (1500)
+                ppi: ["20251125", "20251214", "S/ 1,500.00", "S/ 85,000.00", "90", "S/ 85,000.00", "S/ 70,000.00", "S/ 14,000.00", "S/ 1,000.00", "S/ 1,200.00", "S/ 800.00", "S/ 300.00", "S/ 100.00", "S/ 450.00"],
             }
         }
     };
-
-    // ==========================================
-    // FUNCIONES JS
-    // ==========================================
 
     function buscarCliente() {
         const dniInput = document.getElementById('dniInput');
@@ -294,12 +304,10 @@
     }
 
     function limpiarCampos() {
-        // Limpia textos
         ['p_nombre', 'p_fechanac', 'p_numtel', 'p_direccion', 'p_distrito', 'p_correo', 'p_mora', 'p_producto',
          'c_tipo', 'c_accion_cob', 'c_accion_tar', 'c_tasa_tc', 'c_tasa_camp_tc', 'c_tasa_ppd', 'c_tasa_camp_ppd', 'c_plazo_max', 'c_gift', 'c_plazo_min'
         ].forEach(id => document.getElementById(id).innerText = "");
 
-        // Limpia tablas
         document.getElementById('cardDebtBody').innerHTML = '<tr><td colspan="3">Datos no disponibles</td></tr>';
         document.getElementById('loanDebtBody').innerHTML = '<tr><td colspan="4">Datos no disponibles</td></tr>';
     }
@@ -353,7 +361,6 @@
         }
     }
 
-    // Escuchar el evento "Enter" dentro de la tabla
     document.getElementById('dniInput').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             buscarCliente();
