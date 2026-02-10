@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Cobranza Maestro - Academia Geincos</title>
+    <style>
+        :root {
+            --header-blue: #b4c7e7;
+            --border-gray: #000000;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            padding: 20px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .main-container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .tables-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            font-size: 11px;
+            width: 48%;
+        }
+
+        th, td {
+            border: 1px solid var(--border-gray);
+            padding: 2px 8px;
+            height: 18px;
+            color: #000;
+        }
+
+        .header-cell {
+            background-color: var(--header-blue);
+            text-align: center;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .label-cell {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: left;
+            width: 140px;
+        }
+
+        .data-cell {
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .dni-container {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        input#inputDni {
+            width: 90px;
+            text-align: center;
+            border: 1px solid #777;
+            font-size: 11px;
+        }
+
+        .btn-consultar {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 1px 6px;
+            cursor: pointer;
+            font-size: 10px;
+            border-radius: 2px;
+        }
+
+        .debt-title {
+            text-align: center;
+            font-weight: bold;
+            font-style: italic;
+            padding: 15px 0;
+            font-size: 14px;
+        }
+
+        .sub-header {
+            background-color: var(--header-blue);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .negrita { font-weight: bold; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="main-container">
+    <div class="tables-row">
+        <table>
+            <tr>
+                <td class="label-cell">DNI</td>
+                <td class="data-cell">
+                    <div class="dni-container">
+                        <input type="text" id="inputDni" maxlength="8" placeholder="Ingrese DNI">
+                        <button class="btn-consultar" onclick="consultar()">Consultar</button>
+                    </div>
+                </td>
+            </tr>
+            <tr><td class="label-cell">NOMBRE</td><td class="data-cell" id="res_nombre"></td></tr>
+            <tr><td class="label-cell">FechaNacimiento</td><td class="data-cell" id="res_fnac"></td></tr>
+            <tr><td class="label-cell">NUMTEL</td><td class="data-cell" id="res_tel"></td></tr>
+            <tr><td class="label-cell">DIRECCION</td><td class="data-cell" id="res_dir"></td></tr>
+            <tr><td class="label-cell">DISTRITO</td><td class="data-cell" id="res_dist"></td></tr>
+            <tr><td class="label-cell">CORREO</td><td class="data-cell" id="res_correo"></td></tr>
+            <tr><td class="label-cell">MORA_SOCIO</td><td class="data-cell" id="res_mora"></td></tr>
+            <tr><td class="label-cell">NOMBRE_PRODUCTO</td><td class="data-cell">MILES</td></tr>
+        </table>
+
+        <table>
+            <tr><th colspan="2" class="header-cell">Información Campaña</th></tr>
+            <tr><td class="label-cell">TipoCampaña</td><td class="data-cell" id="res_tcampana"></td></tr>
+            <tr><td class="label-cell">Accion_Cobranzas</td><td class="data-cell" id="res_acob"></td></tr>
+            <tr><td class="label-cell">AcciónTarjeta</td><td class="data-cell" id="res_atarj"></td></tr>
+            <tr><td class="label-cell">Tasa_TC_PCT</td><td class="data-cell" id="res_tasa_tc"></td></tr>
+            <tr><td class="label-cell">Tasa_Campaña_TC</td><td class="data-cell" id="res_tasa_ctc"></td></tr>
+            <tr><td class="label-cell">Tasa_PPD</td><td class="data-cell">0</td></tr>
+            <tr><td class="label-cell">Tasa_Campaña_PPD</td><td class="data-cell" id="res_tasa_ppd">0</td></tr>
+            <tr><td class="label-cell">PlazoMaximo_PPD</td><td class="data-cell" id="res_plazo">36</td></tr>
+            <tr><td class="label-cell">GIFT</td><td class="data-cell">Sin Campaña%</td></tr>
+            <tr><td class="label-cell">PlazoMinimoOfrecer</td><td class="data-cell" id="res_pmin">6</td></tr>
+        </table>
+    </div>
+
+    <div class="debt-title">Información Deuda Socio</div>
+
+    <div class="tables-row">
+        <table>
+            <tr class="sub-header">
+                <td>TARJETA</td>
+                <td>SOLES</td>
+                <td>DÓLARES</td>
+            </tr>
+            <tr><td class="label-cell">FechaFacturacion</td><td id="res_ffac_s"></td><td id="res_ffac_d"></td></tr>
+            <tr><td class="label-cell">FechaVencimiento</td><td id="res_fven_s"></td><td id="res_fven_d"></td></tr>
+            <tr><td class="label-cell">Factu_Min</td><td id="res_fmin_s"></td><td id="res_fmin_d"></td></tr>
+            <tr><td class="label-cell">Factu_Mes</td><td id="res_fmes_s"></td><td id="res_fmes_d"></td></tr>
+            <tr><td class="label-cell">Mora_Producto</td><td id="res_mprod_s"></td><td id="res_mprod_d"></td></tr>
+            <tr><td class="label-cell negrita">Saldo_Total</td><td class="negrita" id="res_st_s"></td><td class="negrita" id="res_st_d"></td></tr>
+            <tr><td class="label-cell">Capital_Total</td><td id="res_ct_s"></td><td id="res_ct_d"></td></tr>
+            <tr><td class="label-cell">Interes_Total</td><td id="res_it_s"></td><td id="res_it_d"></td></tr>
+            <tr><td class="label-cell">Comision_Total</td><td id="res_comt_s"></td><td id="res_comt_d"></td></tr>
+            <tr><td class="label-cell negrita">Saldo_Total_Mora</td><td class="negrita" id="res_stm_s"></td><td class="negrita" id="res_stm_d"></td></tr>
+            <tr><td class="label-cell">Capital_Mora</td><td id="res_cm_s"></td><td id="res_cm_d"></td></tr>
+            <tr><td class="label-cell">Interes_Mora</td><td id="res_im_s"></td><td id="res_im_d"></td></tr>
+            <tr><td class="label-cell">Comision_Mora</td><td id="res_comm_s"></td><td id="res_comm_d"></td></tr>
+            <tr><td class="label-cell">Interes_Acumulado</td><td id="res_ia_s"></td><td id="res_ia_d"></td></tr>
+        </table>
+
+        <table>
+            <tr class="sub-header">
+                <td>PRÉSTAMO</td>
+                <td>PPD</td>
+                <td>PPD CAPITAL</td>
+                <td>PPI</td>
+            </tr>
+            <tr><td class="label-cell">FechaFacturacion</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td class="label-cell">FechaVencimiento</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td class="label-cell">Factu_Min</td><td>S/ 0.00</td><td>S/ 0.00</td><td>S/ 0.00</td></tr>
+            <tr><td class="label-cell">Factu_Mes</td><td>S/ 0.00</td><td>S/ 0.00</td><td>S/ 0.00</td></tr>
+            <tr><td class="label-cell">Mora_Producto</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td class="label-cell negrita">Saldo_Total</td><td class="negrita" id="p_st">S/ 0.00</td><td class="negrita">S/ 0.00</td><td class="negrita">S/ 0.00</td></tr>
+            <tr><td class="label-cell">Capital_Total</td><td id="p_ct">S/ 0.00</td><td>S/ 0.00</td><td>S/ 0.00</td></tr>
+            <tr><td class="label-cell">Interes_Total</td><td>S/ 0.00</td><td>S/ 0.00</td><td>S/ 0.00</td></tr>
+            <tr><td class="label-cell">Comision_Total</td><td>S/ 0.00</td><td>S/ 0.00</td><td>S/ 0.00</td></tr>
+            <tr><td class="label-cell negrita">Saldo_Total_Mora</td><td class="negrita">S/ 0.00</td><td>S/ 0.00</td><td>S/ 0.00</td></tr>
+            <tr><td class="label-cell">Capital_Mora</td><td>S/ 0.00</td><td>S/ 0.00</td><td>S/ 0.00</td></tr>
+            <tr><td class="label-cell">Interes_Mora</td><td>S/ 0.00</td><td>S/ 0.00</td><td>S/ 0.00</td></tr>
+            <tr><td class="label-cell">Comision_Mora</td><td>S/ 0.00</td><td>S/ 0.00</td><td>S/ 0.00</td></tr>
+            <tr><td class="label-cell">Interes_Acumulado</td><td>S/ 0.00</td><td>S/ 0.00</td><td>S/ 0.00</td></tr>
+        </table>
+    </div>
+</div>
+
+<script>
+    const db = {
+        "44631847": {
+            n: "Anderh Yuver Garcia Bravo", fn: "19871115", tel: "914493014", dir: "CAL. LOS JAZMINES 105 PROL. 28 DE JULIO", dist: "Reque", cor: "ANDERH_20@HOTMAIL.COM", mora: "113 días",
+            tc: "Refinancia", acob: "Refinancia 0", atarj: "Cancelación TC", tasa_tc: "0", tasa_ctc: "0", plazo: "60", pmin: "0",
+            ffac: "20251125", fven: "20251214", fmin_s: "S/ 2,094.64", fmin_d: "$ 19.50", fmes_s: "S/ 3,378.21", fmes_d: "$ 19.50", mprod_s: "113", mprod_d: "51", st_s: "S/ 3,378.21", st_d: "$ 19.50", ct_s: "S/ 2,867.34", ct_d: "$ 0.00", it_s: "S/ 490.97", it_d: "$ 0.00", comt_s: "S/ 19.90", comt_d: "$ 19.50", stm_s: "S/ 1,646.34", stm_d: "$ 13.00", cm_s: "S/ 1,210.43", cm_d: "$ 0.00", im_s: "S/ 416.01", im_d: "$ 0.00", comm_s: "S/ 19.90", comm_d: "$ 13.00", ia_s: "S/ 33.69", ia_d: "$ 0.00", p_st: "S/ 0.00"
+        },
+        "45646799": {
+            n: "Christian Jesus Reymundo Vega", fn: "19880910", tel: "955702488", dir: "CAL. 1 DPTO 807 BLOCK A GRP. C ONDOMINIO LOS PARQUES DEL AGU", dist: "El Agustino", cor: "CHRISTIANREYMUNDO10@GMAIL.COM", mora: "0 días",
+            tc: "0", acob: "0", atarj: "Evaluación Créditos", tasa_tc: "59.9", tasa_ctc: "65.5", plazo: "36", pmin: "6",
+            ffac: "20260118", fven: "20260205", fmin_s: "S/ 1,400.36", fmin_d: "$ 6.50", fmes_s: "S/ 3,514.51", fmes_d: "$ 6.50", mprod_s: "0", mprod_d: "0", st_s: "S/ 11,402.00", st_d: "$ 6.50", ct_s: "S/ 11,332.92", ct_d: "$ 0.00", it_s: "S/ 69.08", it_d: "$ 0.00", comt_s: "S/ 0.00", comt_d: "$ 6.50", stm_s: "S/ 1,400.36", stm_d: "$ 6.50", cm_s: "S/ 1,331.28", cm_d: "$ 0.00", im_s: "S/ 69.08", im_d: "$ 0.00", comm_s: "S/ 0.00", comm_d: "$ 6.50", ia_s: "S/ 65.79", ia_d: "$ 0.00", p_st: "S/ 0.00"
+        },
+        "40111110": {
+            n: "Julio Giancarlo Gonzales Sanchez", fn: "19790101", tel: "994304440", dir: "CAL. CALLE IRIGOYEN 381 CHACLA CAYO", dist: "Lima", cor: "juliogiancarlo.gonzales@gmail.com", mora: "44 días",
+            tc: "Refinancia", acob: "Refinancia 13.9", atarj: "Cancelación TC", tasa_tc: "72.53", tasa_ctc: "0", plazo: "36", pmin: "6",
+            ffac: "20260202", fven: "20260220", fmin_s: "S/ 203.89", fmin_d: "$ 16.64", fmes_s: "S/ 203.89", fmes_d: "$ 16.64", mprod_s: "10", mprod_d: "44", st_s: "S/ 248.34", st_d: "$ 16.64", ct_s: "S/ 215.26", ct_d: "$ 0.00", it_s: "S/ 33.08", it_d: "$ 0.00", comt_s: "S/ 0.00", comt_d: "$ 16.64", stm_s: "S/ 106.82", stm_d: "$ 12.61", cm_s: "S/ 85.40", cm_d: "$ 0.00", im_s: "S/ 21.42", im_d: "$ 0.00", comm_s: "S/ 0.00", comm_d: "$ 12.61", ia_s: "S/ 2.50", ia_d: "$ 0.00", p_st: "S/ 0.00"
+        },
+        "25831894": {
+            n: "Renzo Raul Rufasto Lira", fn: "19770727", tel: "945335082", dir: "JR LOS ALAMOS 378 103A", dist: "Santiago de Surco", cor: "rrufasto@hotmail.com", mora: "0 días",
+            tc: "Cambio de Plan", acob: "> Plazo", atarj: "Evaluación Créditos", tasa_tc: "39.94", tasa_ctc: "39.99", plazo: "36", pmin: "6",
+            ffac: "20260118", fven: "20260205", fmin_s: "S/ 1,219.77", fmin_d: "$ 46.24", fmes_s: "S/ 1,789.69", fmes_d: "$ 551.41", mprod_s: "0", mprod_d: "0", st_s: "S/ 5,388.94", st_d: "$ 628.45", ct_s: "S/ 5,035.41", ct_d: "$ 604.18", it_s: "S/ 103.53", it_d: "$ 17.77", comt_s: "S/ 250.00", comt_d: "$ 6.50", stm_s: "S/ 1,219.77", stm_d: "$ 46.24", cm_s: "S/ 866.24", cm_d: "$ 21.97", im_s: "S/ 103.53", im_d: "$ 17.77", comm_s: "S/ 250.00", comm_d: "$ 6.50", ia_s: "S/ 41.04", ia_d: "$ 10.55", p_st: "S/ 0.00"
+        },
+        "47935052": {
+            n: "Xindel Liyen Chipile Chung", fn: "19930909", tel: "997126355", dir: "CAL. MIGUEL ALEGRE 262", dist: "Miraflores", cor: "XINDELLIYEN@GMAIL.COM", mora: "0 días",
+            tc: "0", acob: "0", atarj: "Evaluación Créditos", tasa_tc: "59.9", tasa_ctc: "65.5", plazo: "36", pmin: "6",
+            ffac: "20260118", fven: "20260205", fmin_s: "S/ 859.77", fmin_d: "$ 56.31", fmes_s: "S/ 859.77", fmes_d: "$ 56.31", mprod_s: "0", mprod_d: "0", st_s: "S/ 9,496.35", st_d: "$ 93.72", ct_s: "S/ 9,344.56", ct_d: "$ 46.54", it_s: "S/ 151.79", it_d: "$ 40.68", comt_s: "S/ 0.00", comt_d: "$ 6.50", stm_s: "S/ 859.77", stm_d: "$ 56.31", cm_s: "S/ 707.98", cm_d: "$ 9.13", im_s: "S/ 151.79", im_d: "$ 40.68", comm_s: "S/ 0.00", comm_d: "$ 6.50", ia_s: "S/ 10.61", ia_d: "$ 0.58", p_st: "S/ 0.00"
+        },
+        "44381241": {
+            n: "Gino Mario Jimenez Tinoco", fn: "19870711", tel: "956031129", dir: "CAL. HIPOLITO UNANUE DPTO607 R ES. CONDOMINO VILLA BONITA2", dist: "Callao", cor: "ginomariojt@gmail.com", mora: "10 días",
+            tc: "Refinancia", acob: "Refinancia 13.9", atarj: "Cancelación TC", tasa_tc: "59.9", tasa_ctc: "0", plazo: "36", pmin: "6",
+            ffac: "20260202", fven: "20260220", fmin_s: "S/ 88.56", fmin_d: "$ 65.61", fmes_s: "S/ 1,210.43", fmes_d: "$ 1,026.26", mprod_s: "0", mprod_d: "10", st_s: "S/ 1,210.43", st_d: "$ 1,026.26", ct_s: "S/ 1,170.65", ct_d: "$ 1,012.42", it_s: "S/ 39.78", it_d: "$ 0.84", comt_s: "S/ 0.00", comt_d: "$ 13.00", stm_s: "S/ 0.00", stm_d: "$ 16.61", cm_s: "S/ 0.00", cm_d: "$ 10.00", im_s: "S/ 0.00", im_d: "$ 0.11", comm_s: "S/ 0.00", comm_d: "$ 6.50", ia_s: "S/ 4.67", ia_d: "$ 4.05", p_st: "-S/ 0.28"
+        }
+    };
+
+    function consultar() {
+        const val = document.getElementById('inputDni').value;
+        const d = db[val];
+        if(!d) return alert("DNI no registrado.");
+
+        document.getElementById('res_nombre').innerText = d.n;
+        document.getElementById('res_fnac').innerText = d.fn;
+        document.getElementById('res_tel').innerText = d.tel;
+        document.getElementById('res_dir').innerText = d.dir;
+        document.getElementById('res_dist').innerText = d.dist;
+        document.getElementById('res_correo').innerText = d.cor;
+        document.getElementById('res_mora').innerText = d.mora;
+        document.getElementById('res_tcampana').innerText = d.tc;
+        document.getElementById('res_acob').innerText = d.acob;
+        document.getElementById('res_atarj').innerText = d.atarj;
+        document.getElementById('res_tasa_tc').innerText = d.tasa_tc;
+        document.getElementById('res_tasa_ctc').innerText = d.tasa_ctc;
+        document.getElementById('res_plazo').innerText = d.plazo;
+        document.getElementById('res_pmin').innerText = d.pmin;
+
+        // Llenado Tarjeta
+        document.getElementById('res_ffac_s').innerText = d.ffac;
+        document.getElementById('res_ffac_d').innerText = d.ffac;
+        document.getElementById('res_fven_s').innerText = d.fven;
+        document.getElementById('res_fven_d').innerText = d.fven;
+        document.getElementById('res_fmin_s').innerText = d.fmin_s;
+        document.getElementById('res_fmin_d').innerText = d.fmin_d;
+        document.getElementById('res_fmes_s').innerText = d.fmes_s;
+        document.getElementById('res_fmes_d').innerText = d.fmes_d;
+        document.getElementById('res_mprod_s').innerText = d.mprod_s;
+        document.getElementById('res_mprod_d').innerText = d.mprod_d;
+        document.getElementById('res_st_s').innerText = d.st_s;
+        document.getElementById('res_st_d').innerText = d.st_d;
+        document.getElementById('res_ct_s').innerText = d.ct_s;
+        document.getElementById('res_ct_d').innerText = d.ct_d;
+        document.getElementById('res_it_s').innerText = d.it_s;
+        document.getElementById('res_it_d').innerText = d.it_d;
+        document.getElementById('res_comt_s').innerText = d.comt_s;
+        document.getElementById('res_comt_d').innerText = d.comt_d;
+        document.getElementById('res_stm_s').innerText = d.stm_s;
+        document.getElementById('res_stm_d').innerText = d.stm_d;
+        document.getElementById('res_cm_s').innerText = d.cm_s;
+        document.getElementById('res_cm_d').innerText = d.cm_d;
+        document.getElementById('res_im_s').innerText = d.im_s;
+        document.getElementById('res_im_d').innerText = d.im_d;
+        document.getElementById('res_comm_s').innerText = d.comm_s;
+        document.getElementById('res_comm_d').innerText = d.comm_d;
+        document.getElementById('res_ia_s').innerText = d.ia_s;
+        document.getElementById('res_ia_d').innerText = d.ia_d;
+
+        // Préstamo (Solo Saldo Total para este ejemplo)
+        document.getElementById('p_st').innerText = d.p_st;
+        document.getElementById('p_ct').innerText = d.p_st;
+    }
+
+    document.onkeydown = (e) => {
+        if(e.ctrlKey && (e.key === 'c' || e.key === 'u' || e.key === 'i' || e.key === 's') || e.key === 'F12') return false;
+    };
+</script>
+</body>
+</html>
